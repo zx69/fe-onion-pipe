@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .box{
+      background: red;
+      width: 100px;
+      height: 100px;
+      position: absolute;
+    }
+    .desc{
+      width: 300px;
+      height: 500px;
+      border: 1px solid #eee;
+      position:fixed;
+      right: 0;
+      top: 0;
+      padding: 0 20px;
+      white-space: pre;
+    }
+  </style>
+</head>
+<body>
+  <div class="box"></div>
+  <div class="desc"></div>
+  <!-- <script type="module">
+    import OnionPipe from './core.js';
+
+    const box = document.querySelector('.box');
+    const desc = document.querySelector('.desc');
+
+    function addRecord(ctx){
+      desc.innerHTML = `
+        <h1>位置记录</h1>\n
+        拖动起始位置：
+          x: ${ctx.from.x},
+          y: ${ctx.from.y},
+        \n
+        拖动当前位置：
+          x: ${ctx.current.x},
+          y: ${ctx.current.y},
+        \n
+        拖动结束位置：
+          x: ${ctx.to.x},
+          y: ${ctx.to.y},
+      `
+    }
+
+    const onionPipe = new OnionPipe({
+      current: {
+        x: null,
+        y: null,
+      },
+      from: {
+        x: null,
+        y: null,
+      },
+      to: {
+        x: null,
+        y: null,
+      }
+    });
+
+    addRecord(onionPipe.params);
+    
+    onionPipe.on(async (ctx, next) => {
+      console.log('start drag');
+      addRecord(ctx);
+      await next();
+      addRecord(ctx);
+      console.log('end drag');
+    })
+    // onionPipe.on((ctx, next) => {
+    //   console.log('break!!')
+    // })
+    onionPipe.on(async (ctx, next) => {
+      console.log({ctx})
+      const moveFn = (e) => {
+        console.log('move')
+        ctx.current.x = e.pageX;
+        ctx.current.y = e.pageY;
+        // console.log(onionPipe.current.x, onionPipe.current.y);
+        box.style.left = `${ctx.current.x - onionPipe.params.deltaPos.x}px`;
+        box.style.top = `${ctx.current.y - onionPipe.params.deltaPos.y}px`;
+        addRecord(ctx);
+      }
+      document.addEventListener('mousemove', moveFn);
+      await next();
+      document.removeEventListener('mousemove', moveFn);
+    })
+
+    onionPipe.on(async (ctx, next) => {
+      const upFn = (e) => {
+        console.log('up');
+        ctx.to.x = e.pageX;
+        ctx.to.y = e.pageY;
+        onionPipe.off();
+      };
+      document.addEventListener('mouseup', upFn);
+      await next();
+      document.removeEventListener('mouseup', upFn);
+    })
+
+    onionPipe.on(async (ctx, next) => {
+      await next();
+    })
+
+    box.addEventListener('mousedown', (e) => {
+      onionPipe.params.from.x = e.pageX;
+      onionPipe.params.from.y = e.pageY; 
+      const boxClientPos = box.getBoundingClientRect();
+      onionPipe.params.deltaPos = {
+        x: e.pageX - boxClientPos.x,
+        y: e.pageY - boxClientPos.y,
+      }
+      onionPipe.emit();
+    });
+
+  </script> -->
+  <script>
+    const box = document.querySelector('.box');
+    const desc = document.querySelector('.desc');
+    box.addEventListener('mousedown', (e) => {
+      const _params = {
+        current: {
+          // x: null,
+          // y: null,
+        },
+        from: {
+          // x: null,
+          // y: null,
+        },
+        to: {
+          // x: null,
+          // y: null,
+        },
+      }
+      _params.from.x = e.pageX;
+      _params.from.y = e.pageY; 
+      const boxClientPos = box.getBoundingClientRect();
+      _params.deltaPos = {
+        x: e.pageX - boxClientPos.x,
+        y: e.pageY - boxClientPos.y,
+      }
+      console.log(JSON.stringify(_params.deltaPos));
+      const moveHandle = (_e) => {
+        console.log('move')
+        _params.current.x = _e.pageX;
+        _params.current.y = _e.pageY;
+        console.log(JSON.stringify(_params.current), JSON.stringify(_params.deltaPos));
+        box.style.left = `${_params.current.x - _params.deltaPos.x}px`;
+        box.style.top = `${_params.current.y - _params.deltaPos.y}px`;
+      };
+      
+      const mouseupHandle = () => {
+        document.removeEventListener('mousemove', moveHandle);
+        document.removeEventListener('mouseup', mouseupHandle);
+      };
+
+      document.addEventListener('mousemove', moveHandle);
+      document.addEventListener('mouseup', mouseupHandle);
+    })
+  </script>
+</body>
+</html>
