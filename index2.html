@@ -13,7 +13,7 @@
       position: absolute;
       left: 0;
       top: 100px;
-      transition: all 1s;
+      transition: all 300ms;
     }
   </style>
 </head>
@@ -50,60 +50,28 @@
         })
       })
     }
-    // onionPipe.on(async (ctx, next) => {
-    //   const fn = () => {
 
-    //   }
-    //   box.addEventListener('transitionEnd', fn)
-    //   await next();
-    // });
-    onionPipe.on(async (ctx, next) => {
-      await p(() => box.style.width = '200px');
-      await next();
-      await p(()=> box.style.width = '100px');
-    });
-    
-    onionPipe.on(async (ctx, next) => {
-      await p(() => box.style.height = '200px'); 
-      await next();
-      await p(() => box.style.height = '100px');
-    });
-
-    onionPipe.on(async (ctx, next) => {
-      await p(() => box.style.width = '300px'); 
-      await next();
-      await p(() => box.style.width = '200px'); 
-    });
+    for(let i = 0; i<3; i++){
+      onionPipe.on(async (ctx, next) => {
+        let oldWidth = box.getBoundingClientRect().width;
+        console.log(oldWidth);
+        await p(() => box.style.width = `${oldWidth + 100}px`);
+        await next();
+        await p(()=> box.style.width = `${oldWidth}px`);
+      });
+      
+      onionPipe.on(async (ctx, next) => {
+        let oldHeight = box.getBoundingClientRect().height;
+        await p(() => box.style.height = `${oldHeight + 100}px`);
+        await next();
+        await p(() => box.style.height = `${oldHeight}px`);
+      });
+    }
 
     onionPipe.on(async (ctx, next) => {
-      await p(() => box.style.height = '300px'); 
       await next();
-      await p(() => box.style.height = '200px');
     });
 
-    // onionPipe.on(async (ctx, next) => {
-    //   box.style.height = '200px';
-    //   await p
-    //   await next();
-    //   box.style.height = '100px';
-    // });
-    // onionPipe.on(async (ctx, next) => {
-    //   box.addEventListener('transitionEnd', async () => {
-    //     await next();
-    //   })
-    // });
-    // onionPipe.on(async (ctx, next) => {
-    //   box.addEventListener('transitionEnd', async () => {
-    //     box.style.height = '200px';
-    //     await next();
-    //     box.addEventListener('transitionEnd', () => {
-    //       box.style.height = '100px';
-    //     })
-    //   })
-    // });
-    onionPipe.on(async (ctx, next) => {
-      await next();
-    });
     btn.addEventListener('click', () => {
       console.log(onionPipe.params.active);
       if(!onionPipe.params.active){
