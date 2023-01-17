@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .box{
+      background: red;
+      width: 100px;
+      height: 100px;
+      position: absolute;
+      left: 0;
+      top: 100px;
+      transition: all 1s;
+    }
+  </style>
+</head>
+<body>
+  <button class="button">click</button>
+  <div class="box"></div>
+  <script type="module">
+    import OnionPipe from './core.js';
+    function delay(t){
+      return new Promise(function (r) {
+        setTimeout(function () {
+          r('resolve');
+        }, t);
+      });
+    }
+
+    const btn = document.querySelector('.button');
+    const box = document.querySelector('.box');
+    const onionPipe = new OnionPipe({
+      active: false,
+    });
+    onionPipe.on(async (ctx, next) => {
+      ctx.active = true;
+      await next();
+      ctx.active = false;
+    });
+ 
+    let p = (setStyleFn) => {
+      setStyleFn && setStyleFn();
+      return new Promise((resolve) => {
+        box.addEventListener('transitionend', async function aa(){
+          box.removeEventListener('transitionend', aa)
+          resolve();
+        })
+      })
+    }
+    // onionPipe.on(async (ctx, next) => {
+    //   const fn = () => {
+
+    //   }
+    //   box.addEventListener('transitionEnd', fn)
+    //   await next();
+    // });
+    onionPipe.on(async (ctx, next) => {
+      await p(() => box.style.width = '200px');
+      await next();
+      await p(()=> box.style.width = '100px');
+    });
+    
+    onionPipe.on(async (ctx, next) => {
+      await p(() => box.style.height = '200px'); 
+      await next();
+      await p(() => box.style.height = '100px');
+    });
+
+    onionPipe.on(async (ctx, next) => {
+      await p(() => box.style.width = '300px'); 
+      await next();
+      await p(() => box.style.width = '200px'); 
+    });
+
+    onionPipe.on(async (ctx, next) => {
+      await p(() => box.style.height = '300px'); 
+      await next();
+      await p(() => box.style.height = '200px');
+    });
+
+    // onionPipe.on(async (ctx, next) => {
+    //   box.style.height = '200px';
+    //   await p
+    //   await next();
+    //   box.style.height = '100px';
+    // });
+    // onionPipe.on(async (ctx, next) => {
+    //   box.addEventListener('transitionEnd', async () => {
+    //     await next();
+    //   })
+    // });
+    // onionPipe.on(async (ctx, next) => {
+    //   box.addEventListener('transitionEnd', async () => {
+    //     box.style.height = '200px';
+    //     await next();
+    //     box.addEventListener('transitionEnd', () => {
+    //       box.style.height = '100px';
+    //     })
+    //   })
+    // });
+    onionPipe.on(async (ctx, next) => {
+      await next();
+    });
+    btn.addEventListener('click', () => {
+      console.log(onionPipe.params.active);
+      if(!onionPipe.params.active){
+        onionPipe.emit();
+      }else{
+        onionPipe.off();
+      }
+    })
+  </script>
+</body>
+</html>
